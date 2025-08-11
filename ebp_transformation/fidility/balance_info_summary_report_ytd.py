@@ -1,0 +1,39 @@
+import pandas as pd
+
+from .base import BaseTransformer
+
+
+class BalanceInfoSummaryReportYtd(BaseTransformer):
+    def transform(self):
+        # Step 1: Read the input Excel file
+        df = pd.read_excel(self.input_path)
+
+        # Step 2: Define base and optional group-by columns
+        base_group_cols = ["SSN", "First Name - DC", "Last Name - DC", "Date of Birth"]
+        optional_cols = ["Hire Date", "Eligible Date", "Term Date", "Loan Repayment"]
+
+        # Step 3: Check for which optional columns are present in the file
+        available_optional_cols = [col for col in optional_cols if col in df.columns]
+
+        # Step 4: Group-by columns = base + available optional
+        group_cols = base_group_cols + available_optional_cols
+
+        # Step 5: Define numeric columns to sum (make sure they exist)
+        sum_cols = ["Beginning Balance Cost $", "Contribution $", "Ending Balance Cost $"]
+        existing_sum_cols = [col for col in sum_cols if col in df.columns]
+
+        # Step 6: Perform groupby + aggregation
+        grouped_df = df.groupby(group_cols, as_index=False)[existing_sum_cols].sum()
+
+        # Step 7: Add missing optional columns (if any), set them to None
+        missing_optional_cols = [col for col in optional_cols if col not in df.columns]
+        for col in missing_optional_cols:
+            grouped_df[col] = None
+
+        # Step 8: Arrange final column order
+        final_col_order = base_group_cols + available_optional_cols + existing_sum_cols + missing_optional_cols
+        final_col_order = [col for col in final_col_order if col in grouped_df.columns]
+        grouped_df = grouped_df[final_col_order]
+
+        # Step 9: Save the transformed file
+        grouped_df.to_excel(self.output_path, index=False)

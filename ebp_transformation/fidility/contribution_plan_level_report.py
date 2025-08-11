@@ -1,0 +1,15 @@
+import pandas as pd
+
+from .base import BaseTransformer
+
+
+class ContributionPlanLevelReport(BaseTransformer):
+    def transform(self):
+        df = pd.read_excel(self.input_path, dtype=str, skiprows=1)
+        # Drop completely empty rows
+        df.dropna(how="all", inplace=True)
+        header = list(df.columns)
+
+        df.reset_index(drop=True, inplace=True)
+        df = df[~df.apply(lambda row: list(row) == header, axis=1)]
+        df.to_excel(self.output_path, index=False)
