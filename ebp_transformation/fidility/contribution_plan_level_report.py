@@ -1,5 +1,5 @@
 import pandas as pd
-
+from .utils import drop_ending_rows
 from .base import BaseTransformer
 
 
@@ -7,6 +7,7 @@ class ContributionPlanLevelReport(BaseTransformer):
     def transform(self):
         df = pd.read_excel(self.input_path, dtype=str, skiprows=1)
         # Drop completely empty rows
+        df = drop_ending_rows(df)
         df.dropna(how="all", inplace=True)
         header = list(df.columns)
 

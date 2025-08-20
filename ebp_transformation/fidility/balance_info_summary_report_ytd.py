@@ -1,13 +1,15 @@
 import pandas as pd
 
 from .base import BaseTransformer
+from .utils import drop_ending_rows
 
 
 class BalanceInfoSummaryReportYtd(BaseTransformer):
     def transform(self):
         # Step 1: Read the input Excel file
-        df = pd.read_excel(self.input_path)
-
+        df = pd.read_excel(self.input_path, skiprows=5)
+        print("===== Skipping first 5 Rows ======= \n")
+        df = drop_ending_rows(df)
         # Step 2: Define base and optional group-by columns
         base_group_cols = ["SSN", "First Name - DC", "Last Name - DC", "Date of Birth"]
         optional_cols = ["Hire Date", "Eligible Date", "Term Date", "Loan Repayment"]

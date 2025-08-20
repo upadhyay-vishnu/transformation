@@ -1,7 +1,7 @@
 import pandas as pd
 
 from .base import BaseTransformer
-
+from .utils import drop_ending_rows
 
 class AuditR25CheckRegister(BaseTransformer):
     def transform(self):
@@ -11,7 +11,8 @@ class AuditR25CheckRegister(BaseTransformer):
         from SSN, Full Name, Check Cleared Date, and Check Number.
         """
 
-        df = pd.read_excel(self.input_path)
+        df = pd.read_excel(self.input_path, skiprows=8)
+        df = drop_ending_rows(df)
         df.columns = df.columns.str.strip()
 
         # Filter where Check Deduction Type is 'Federal Tax' or blank (case-insensitive)

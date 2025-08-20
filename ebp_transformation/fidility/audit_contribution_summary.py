@@ -1,12 +1,13 @@
 import pandas as pd
 
 from .base import BaseTransformer
-
+from .utils import drop_ending_rows
 
 class ParticipantContributionPivotReport(BaseTransformer):
     def transform(self):
         # Step 1: Read input file
-        df = pd.read_excel(self.input_path)
+        df = pd.read_excel(self.input_path, skiprows=7)
+        df = drop_ending_rows(df)
         df["Source"] = df["Source"].astype(str).str.replace(r"^\d+-\s*", "", regex=True).str.strip()
         required_cols = ["SSN", "Full Name", "Source", "Transaction Cash Amount"]
         for col in required_cols:
