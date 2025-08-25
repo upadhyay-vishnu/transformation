@@ -22,10 +22,10 @@ TRANSFORMER_MAP: Dict[str, Type[BaseTransformer]] = {
     "Loan Withdrawals Report": LoanWithdrawlReport,
     "Withdrawals Report": LoanWithdrawlReport,
     "Balance Info Summary Report_YE": BalanceInfoSummaryReportYtd,
-    "Balance Info Summary Teport-Q4": BalanceInfoSummaryReportQ4,
+    "Balance Info Summary report-Q4": BalanceInfoSummaryReportQ4,
     "Audit Contribution Summary": ParticipantContributionPivotReport,
     "Audit Rollover Report": AuditRolloverReport,
-    "Audit Deferral Elections for a date range":  (NoTransformer, 3),
+    # "Audit Deferral Elections for a date range":  (NoTransformer, 3),
     "Audit R25 Check Register": AuditR25CheckRegister,
     "Participant Contribution by Date and Source-YE": (NoTransformer, 2),
     "Audit Investment Elections As Of a Specific Date": (NoTransformer, 4),
@@ -50,23 +50,27 @@ def process_directory(engagement: str):
     os.makedirs(output_dir, exist_ok=True)
 
     for file_name in os.listdir(input_dir):
-        file_base = Path(file_name).stem.strip()
-        input_file = os.path.join(input_dir, file_name)
-        print(f"Transforming File {file_name} \n")
-        output_file = os.path.join(output_dir, file_name)
-        transformer_cls = TRANSFORMER_MAP.get(file_base)
-        if transformer_cls:
-            if isinstance(transformer_cls, tuple) and len(transformer_cls) == 2:
-                transformer_cls, skip_rows = transformer_cls
-                if transformer_cls == NoTransformer:
-                    transformer = transformer_cls(input_path=input_file, output_path=output_file)
-                    transformer.transform(skip_rows=skip_rows)
+        try:
+            file_base = Path(file_name).stem.strip()
+            input_file = os.path.join(input_dir, file_name)
+            print(f"Transforming File {file_name} \n")
+            output_file = os.path.join(output_dir, file_name)
+            transformer_cls = TRANSFORMER_MAP.get(file_base)
+            if transformer_cls:
+                if isinstance(transformer_cls, tuple) and len(transformer_cls) == 2:
+                    transformer_cls, skip_rows = transformer_cls
+                    if transformer_cls == NoTransformer:
+                        transformer = transformer_cls(input_path=input_file, output_path=output_file)
+                        transformer.transform(skip_rows=skip_rows)
+                    else:
+                        print(f"Transformer Class for File name {file_name} has wrong maping of {transformer_cls.__name__}")
                 else:
-                    print(f"Transformer Class for File name {file_name} has wrong maping of {transformer_cls.__name__}")
+                    transformer = transformer_cls(input_path=input_file, output_path=output_file)
+                    transformer.transform()
             else:
-                transformer = transformer_cls(input_path=input_file, output_path=output_file)
-                transformer.transform()
-        else:
-            print(f"No transformer found for {file_base}")
+                print(f"No transformer found for {file_base}")
+        except Exception as e:
+            print(f"Exception Raised {e}")
+            print("========")
 
     return {"status": "processing complete", "engagement": engagement}

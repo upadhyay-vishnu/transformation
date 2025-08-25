@@ -11,9 +11,13 @@ class BalanceInfoSummaryReportYtd(BaseTransformer):
         print("===== Skipping first 5 Rows ======= \n")
         df = drop_ending_rows(df)
         # Step 2: Define base and optional group-by columns
-        base_group_cols = ["SSN", "First Name - DC", "Last Name - DC", "Date of Birth"]
+        base_group_cols = ["SSN", "First Name - DC", "Last Name - DC"]
         optional_cols = ["Hire Date", "Eligible Date", "Term Date", "Loan Repayment"]
-
+        has_dob = "Date of Birth" in df.columns
+        if has_dob:
+            base_group_cols.append("Date of Birth")
+        else:
+            optional_cols.append("Date of Birth")
         # Step 3: Check for which optional columns are present in the file
         available_optional_cols = [col for col in optional_cols if col in df.columns]
 
