@@ -16,9 +16,8 @@ class AnnualLoanBalanceByPlan(BaseTransformer):
         Returns:
             pd.DataFrame: A DataFrame with consolidated loan entries.
         """
-        df = pd.read_excel(self.input_path, skiprows=0)
+        df = pd.read_excel(self.input_path, skiprows=2)
         df = drop_ending_rows(df)
-        import ipdb; ipdb.set_trace()
         df.columns = df.columns.str.strip()
 
         # Columns you want to group by
