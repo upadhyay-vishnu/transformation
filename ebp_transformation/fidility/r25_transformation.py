@@ -12,6 +12,8 @@ class AuditR25CheckRegister(BaseTransformer):
         """
 
         df = pd.read_excel(self.input_path, skiprows=8)
+        for col in df.select_dtypes(include=["datetime64[ns]"]).columns:
+            df[col] = df[col].dt.date
         df = drop_ending_rows(df)
         df.columns = df.columns.str.strip()
 
@@ -33,5 +35,10 @@ class AuditR25CheckRegister(BaseTransformer):
         )
         df_final = df_filtered.drop_duplicates(subset=["concat_key"]).drop(columns=["concat_key"])
 
+        if "Check Date" in df.columns:
+            df['Check Date'] = pd.to_datetime(df['Check Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+        if "Check Cleared Date" in df.columns:
+            df['Check Cleared Date'] = pd.to_datetime(df['Check Cleared Date'], errors='coerce').dt.strftime("%Y-%m-%d")
         # Save to output
+        
         df_final.to_excel(self.output_path, index=False)

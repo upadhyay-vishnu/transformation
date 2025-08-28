@@ -9,6 +9,9 @@ class BalanceInfoSummaryReportYtd(BaseTransformer):
         # Step 1: Read the input Excel file
         df = pd.read_excel(self.input_path, skiprows=5)
         print("===== Skipping first 5 Rows ======= \n")
+        df.columns = df.columns.str.strip()
+        for col in df.select_dtypes(include=["datetime64[ns]"]).columns:
+            df[col] = df[col].dt.date
         df = drop_ending_rows(df)
         # Step 2: Define base and optional group-by columns
         base_group_cols = ["SSN", "First Name - DC", "Last Name - DC"]
@@ -42,4 +45,16 @@ class BalanceInfoSummaryReportYtd(BaseTransformer):
         grouped_df = grouped_df[final_col_order]
 
         # Step 9: Save the transformed file
+        if "Hire Date" in grouped_df.columns:
+            grouped_df['Hire Date'] = pd.to_datetime(grouped_df['Hire Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+        
+        if "Term Date" in grouped_df.columns:
+            grouped_df['Term Date'] = pd.to_datetime(grouped_df['Term Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+        
+        if "Date of Birth" in grouped_df.columns:
+            grouped_df['Date of Birth'] = pd.to_datetime(grouped_df['Date of Birth'], errors='coerce').dt.strftime("%Y-%m-%d")
+        
+        if "Eligible Date" in grouped_df.columns:
+            grouped_df['Eligible Date'] = pd.to_datetime(grouped_df['Eligible Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+        
         grouped_df.to_excel(self.output_path, index=False)

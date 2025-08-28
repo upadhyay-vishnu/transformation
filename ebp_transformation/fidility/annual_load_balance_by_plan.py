@@ -16,8 +16,9 @@ class AnnualLoanBalanceByPlan(BaseTransformer):
         Returns:
             pd.DataFrame: A DataFrame with consolidated loan entries.
         """
-        df = pd.read_excel(self.input_path, skiprows=2)
+        df = pd.read_excel(self.input_path, skiprows=0)
         df = drop_ending_rows(df)
+        import ipdb; ipdb.set_trace()
         df.columns = df.columns.str.strip()
 
         # Columns you want to group by
@@ -44,4 +45,11 @@ class AnnualLoanBalanceByPlan(BaseTransformer):
 
         # 5. Group
         consolidated_df = df.groupby(grouping_columns, as_index=False).agg(agg_dict)
+        if "Origination Date" in consolidated_df.columns:
+            consolidated_df['Origination Date'] = pd.to_datetime(consolidated_df['Origination Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+        if "First Scheduled Payment Date" in consolidated_df.columns:
+            consolidated_df['First Scheduled Payment Date'] = pd.to_datetime(consolidated_df['First Scheduled Payment Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+        if "Final Payment Date" in consolidated_df.columns:
+            consolidated_df['Final Payment Date'] = pd.to_datetime(consolidated_df['Final Payment Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+        
         consolidated_df.to_excel(self.output_path, index=False)

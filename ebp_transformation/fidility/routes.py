@@ -14,6 +14,10 @@ from .loan_withdrawl_report import LoanWithdrawlReport
 from .summary_of_net_trust_assets import SummaryOfNetTrustAssets
 from .r25_transformation import AuditR25CheckRegister
 from .balance_info_summary_report_q4 import BalanceInfoSummaryReportQ4
+from .audit_investment_election import AuditInvestmentElectionsAsOfaSpecificDate
+from .audit_participant_level_activity_report import AuditParticipantLevelActivityReport
+from .participant_contribution_by_date_and_source import ParticipantContribution
+
 TRANSFORMER_MAP: Dict[str, Type[BaseTransformer]] = {
     "Annual Loan Balance by Plan": AnnualLoanBalanceByPlan,
     "Balances by Fund": BalanceByFund,
@@ -27,9 +31,9 @@ TRANSFORMER_MAP: Dict[str, Type[BaseTransformer]] = {
     "Audit Rollover Report": AuditRolloverReport,
     # "Audit Deferral Elections for a date range":  (NoTransformer, 3),
     "Audit R25 Check Register": AuditR25CheckRegister,
-    "Participant Contribution by Date and Source-YE": (NoTransformer, 2),
-    "Audit Investment Elections As Of a Specific Date": (NoTransformer, 4),
-    "Audit participant level activity report": (NoTransformer, 3)
+    "Participant Contribution by Date and Source-YE": ParticipantContribution,
+    "Audit Investment Elections As Of a Specific Date": AuditInvestmentElectionsAsOfaSpecificDate,
+    "Audit participant level activity report": AuditParticipantLevelActivityReport
 }
 
 CONSTANT_BASE_PATH = os.path.dirname(os.path.dirname(__file__))
@@ -61,7 +65,7 @@ def process_directory(engagement: str):
                     transformer_cls, skip_rows = transformer_cls
                     if transformer_cls == NoTransformer:
                         transformer = transformer_cls(input_path=input_file, output_path=output_file)
-                        transformer.transform(skip_rows=skip_rows)
+                        transformer.transform(skip_rows=skip_rows, cols=[])
                     else:
                         print(f"Transformer Class for File name {file_name} has wrong maping of {transformer_cls.__name__}")
                 else:

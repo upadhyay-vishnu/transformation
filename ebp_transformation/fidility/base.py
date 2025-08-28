@@ -16,5 +16,7 @@ class BaseTransformer:
 class NoTransformer(BaseTransformer):
     def transform(self, skip_rows: int=None):
         df = pd.read_excel(self.input_path, skiprows=skip_rows)
+        for col in df.select_dtypes(include=["datetime64[ns]"]).columns:
+            df[col] = df[col].dt.date
         df = drop_ending_rows(df)
         df.to_excel(self.output_path, index=False)
