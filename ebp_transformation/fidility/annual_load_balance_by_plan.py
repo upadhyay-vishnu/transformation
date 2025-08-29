@@ -45,10 +45,10 @@ class AnnualLoanBalanceByPlan(BaseTransformer):
         # 5. Group
         consolidated_df = df.groupby(grouping_columns, as_index=False).agg(agg_dict)
         if "Origination Date" in consolidated_df.columns:
-            consolidated_df['Origination Date'] = pd.to_datetime(consolidated_df['Origination Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+            consolidated_df['Origination Date'] = pd.to_datetime(consolidated_df['Origination Date'], errors='coerce').dt.strftime("%m-%d-%Y")
         if "First Scheduled Payment Date" in consolidated_df.columns:
-            consolidated_df['First Scheduled Payment Date'] = pd.to_datetime(consolidated_df['First Scheduled Payment Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+            consolidated_df['First Scheduled Payment Date'] = pd.to_datetime(consolidated_df['First Scheduled Payment Date'], errors='coerce').dt.strftime("%m-%d-%Y")
         if "Final Payment Date" in consolidated_df.columns:
-            consolidated_df['Final Payment Date'] = pd.to_datetime(consolidated_df['Final Payment Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+            consolidated_df['Final Payment Date'] = pd.to_datetime(consolidated_df['Final Payment Date'], errors='coerce').dt.strftime("%m-%d-%Y")
         
         consolidated_df.to_excel(self.output_path, index=False)

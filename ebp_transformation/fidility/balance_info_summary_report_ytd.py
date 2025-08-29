@@ -46,15 +46,15 @@ class BalanceInfoSummaryReportYtd(BaseTransformer):
 
         # Step 9: Save the transformed file
         if "Hire Date" in grouped_df.columns:
-            grouped_df['Hire Date'] = pd.to_datetime(grouped_df['Hire Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+            grouped_df['Hire Date'] = pd.to_datetime(grouped_df['Hire Date'], errors='coerce').dt.strftime("%m-%d-%Y")
         
         if "Term Date" in grouped_df.columns:
-            grouped_df['Term Date'] = pd.to_datetime(grouped_df['Term Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+            grouped_df['Term Date'] = pd.to_datetime(grouped_df['Term Date'], errors='coerce').dt.strftime("%m-%d-%Y")
         
         if "Date of Birth" in grouped_df.columns:
-            grouped_df['Date of Birth'] = pd.to_datetime(grouped_df['Date of Birth'], errors='coerce').dt.strftime("%Y-%m-%d")
+            grouped_df['Date of Birth'] = pd.to_datetime(grouped_df['Date of Birth'], errors='coerce').dt.strftime("%m-%d-%Y")
         
         if "Eligible Date" in grouped_df.columns:
-            grouped_df['Eligible Date'] = pd.to_datetime(grouped_df['Eligible Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+            grouped_df['Eligible Date'] = pd.to_datetime(grouped_df['Eligible Date'], errors='coerce').dt.strftime("%m-%d-%Y")
         
         grouped_df.to_excel(self.output_path, index=False)
