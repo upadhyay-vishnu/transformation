@@ -9,7 +9,7 @@ class ParticipantContribution(BaseTransformer):
         df = drop_ending_rows(df)
         df.columns = df.columns.str.strip()
         if "Calendar Day" in df.columns:
-            df['Calendar Day'] = pd.to_datetime(df['Calendar Day'], errors='coerce').dt.strftime("%Y-%m-%d")
+            df['Calendar Day'] = pd.to_datetime(df['Calendar Day'], errors='coerce').dt.strftime("%m-%d-%Y")
         if "Process Date" in df.columns:
-            df['Process Date'] = pd.to_datetime(df['Process Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+            df['Process Date'] = pd.to_datetime(df['Process Date'], errors='coerce').dt.strftime("%m-%d-%Y")
         df.to_excel(self.output_path, index=False)

@@ -16,6 +16,6 @@ class ContributionPlanLevelReport(BaseTransformer):
         df.columns = df.columns.str.strip()
 
         if "Trade Date" in df.columns:
-            df['Trade Date'] = pd.to_datetime(df['Trade Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+            df['Trade Date'] = pd.to_datetime(df['Trade Date'], errors='coerce').dt.strftime("%m-%d-%Y")
 
         df.to_excel(self.output_path, index=False)

@@ -13,7 +13,7 @@ class AuditRolloverReport(BaseTransformer):
         filtered_df = df[df["Transaction"].astype(str).str.strip().str.lower().str.contains("rollover in")]
 
         if "Calendar Day" in filtered_df.columns:
-            filtered_df['Calendar Day'] = pd.to_datetime(filtered_df['Calendar Day'], errors='coerce').dt.strftime("%Y-%m-%d")
+            filtered_df['Calendar Day'] = pd.to_datetime(filtered_df['Calendar Day'], errors='coerce').dt.strftime("%m-%d-%Y")
         if "Process Date" in filtered_df.columns:
-            filtered_df['Process Date'] = pd.to_datetime(filtered_df['Process Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+            filtered_df['Process Date'] = pd.to_datetime(filtered_df['Process Date'], errors='coerce').dt.strftime("%m-%d-%Y")
         filtered_df.to_excel(self.output_path, index=False)

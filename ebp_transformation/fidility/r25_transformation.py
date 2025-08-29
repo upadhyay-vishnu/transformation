@@ -36,9 +36,9 @@ class AuditR25CheckRegister(BaseTransformer):
         df_final = df_filtered.drop_duplicates(subset=["concat_key"]).drop(columns=["concat_key"])
 
         if "Check Date" in df.columns:
-            df['Check Date'] = pd.to_datetime(df['Check Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+            df['Check Date'] = pd.to_datetime(df['Check Date'], errors='coerce').dt.strftime("%m-%d-%Y")
         if "Check Cleared Date" in df.columns:
-            df['Check Cleared Date'] = pd.to_datetime(df['Check Cleared Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+            df['Check Cleared Date'] = pd.to_datetime(df['Check Cleared Date'], errors='coerce').dt.strftime("%m-%d-%Y")
         # Save to output
         
         df_final.to_excel(self.output_path, index=False)

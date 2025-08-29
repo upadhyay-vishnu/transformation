@@ -9,7 +9,7 @@ class AuditInvestmentElectionsAsOfaSpecificDate(BaseTransformer):
         df = drop_ending_rows(df)
         df.columns = df.columns.str.strip()
         if "Hire Date" in df.columns:
-            df['Hire Date'] = pd.to_datetime(df['Hire Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+            df['Hire Date'] = pd.to_datetime(df['Hire Date'], errors='coerce').dt.strftime("%m-%d-%Y")
         if "Termination Date" in df.columns:
-            df['Termination Date'] = pd.to_datetime(df['Termination Date'], errors='coerce').dt.strftime("%Y-%m-%d")
+            df['Termination Date'] = pd.to_datetime(df['Termination Date'], errors='coerce').dt.strftime("%m-%d-%Y")
         df.to_excel(self.output_path, index=False)
