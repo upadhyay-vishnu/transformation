@@ -18,8 +18,10 @@ class SummaryOfNetTrustAssets(BaseTransformer):
             raise ValueError("Expected header not found in file")
 
         # Re-read Excel with correct header
+        is_excel = False
         try:
             df =  pd.read_excel(self.input_path, header=header_row)
+            is_excel = True
         except Exception:
             try:
                 df =  pd.read_csv(self.input_path, header=header_row)
@@ -50,4 +52,7 @@ class SummaryOfNetTrustAssets(BaseTransformer):
         df.loc[net_asset_row, "Total Market Value"] = net_asset_row_data["Total Market Value"]
         df.loc[net_asset_row, ["Price", "Historic Cost", "Share Balance"]] = None
         df = df[df["Fund Name"].astype(str).str.strip() != ""]
-        df.to_excel(self.output_path, index=False)
+        if is_excel:
+            df.to_excel(self.output_path, index=False)
+        else:
+            df.to_csv(self.output_path, index=False)

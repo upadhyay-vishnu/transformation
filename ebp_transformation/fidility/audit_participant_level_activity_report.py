@@ -16,9 +16,11 @@ class AuditParticipantLevelActivityReport(BaseTransformer):
         if header_row is None:
             raise ValueError("Expected header not found in file")
 
+        is_excel = False
         # Re-read Excel with correct header
         try:
             df =  pd.read_excel(self.input_path, header=header_row)
+            is_excel = True
         except Exception:
             try:
                 df =  pd.read_csv(self.input_path, header=header_row)
@@ -31,4 +33,8 @@ class AuditParticipantLevelActivityReport(BaseTransformer):
             df['Calendar Day'] = pd.to_datetime(df['Calendar Day'], errors='coerce').dt.strftime("%m-%d-%Y")
         if "Process Date" in df.columns:
             df['Process Date'] = pd.to_datetime(df['Process Date'], errors='coerce').dt.strftime("%m-%d-%Y")
-        df.to_excel(self.output_path, index=False)
+        
+        if is_excel:
+            df.to_excel(self.output_path, index=False)
+        else:
+            df.to_csv(self.output_path, index=False)

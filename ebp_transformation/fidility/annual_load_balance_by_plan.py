@@ -27,8 +27,10 @@ class AnnualLoanBalanceByPlan(BaseTransformer):
             raise ValueError("Expected header not found in file")
 
         # Re-read Excel with correct header
+        is_excel = False
         try:
             df =  pd.read_excel(self.input_path, header=header_row)
+            is_excel = True
         except Exception:
             try:
                 df =  pd.read_csv(self.input_path, header=header_row)
@@ -67,5 +69,8 @@ class AnnualLoanBalanceByPlan(BaseTransformer):
             consolidated_df['First Scheduled Payment Date'] = pd.to_datetime(consolidated_df['First Scheduled Payment Date'], errors='coerce').dt.strftime("%m-%d-%Y")
         if "Final Payment Date" in consolidated_df.columns:
             consolidated_df['Final Payment Date'] = pd.to_datetime(consolidated_df['Final Payment Date'], errors='coerce').dt.strftime("%m-%d-%Y")
-        
-        consolidated_df.to_excel(self.output_path, index=False)
+
+        if is_excel:
+            consolidated_df.to_excel(self.output_path, index=False)
+        else:
+            consolidated_df.to_csv(self.output_path, index=False)

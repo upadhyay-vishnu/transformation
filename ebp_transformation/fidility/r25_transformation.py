@@ -22,8 +22,10 @@ class AuditR25CheckRegister(BaseTransformer):
         
         if header_row is None:
             raise ValueError("Expected header not found in file")
+        is_excel = False
         try:
             df =  pd.read_excel(self.input_path, header=header_row)
+            is_excel = True
         except Exception:
             try:
                 df =  pd.read_csv(self.input_path, header=header_row)
@@ -58,5 +60,8 @@ class AuditR25CheckRegister(BaseTransformer):
         if "Check Cleared Date" in df.columns:
             df['Check Cleared Date'] = pd.to_datetime(df['Check Cleared Date'], errors='coerce').dt.strftime("%m-%d-%Y")
         # Save to output
-        
-        df_final.to_excel(self.output_path, index=False)
+        if is_excel:
+            df_final.to_excel(self.output_path, index=False)
+        else:
+            df_final.to_csv(self.output_path, index=False)
+

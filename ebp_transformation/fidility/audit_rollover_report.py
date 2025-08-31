@@ -16,9 +16,11 @@ class AuditRolloverReport(BaseTransformer):
         if header_row is None:
             raise ValueError("Expected header not found in file")
 
+        is_excel = False
         # Re-read Excel with correct header
         try:
             df =  pd.read_excel(self.input_path, header=header_row)
+            is_excel = True
         except Exception:
             try:
                 df =  pd.read_csv(self.input_path, header=header_row)
@@ -35,4 +37,7 @@ class AuditRolloverReport(BaseTransformer):
             filtered_df['Calendar Day'] = pd.to_datetime(filtered_df['Calendar Day'], errors='coerce').dt.strftime("%m-%d-%Y")
         if "Process Date" in filtered_df.columns:
             filtered_df['Process Date'] = pd.to_datetime(filtered_df['Process Date'], errors='coerce').dt.strftime("%m-%d-%Y")
-        filtered_df.to_excel(self.output_path, index=False)
+        if is_excel:
+            filtered_df.to_excel(self.output_path, index=False)
+        else:
+            filtered_df.to_csv(self.output_path, index=False)            

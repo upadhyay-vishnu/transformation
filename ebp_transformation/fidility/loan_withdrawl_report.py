@@ -17,8 +17,10 @@ class LoanWithdrawlReport(BaseTransformer):
             raise ValueError("Expected header not found in file")
 
         # Re-read Excel with correct header
+        is_excel = False
         try:
             df =  pd.read_excel(self.input_path, header=header_row)
+            is_excel = True
         except Exception:
             try:
                 df =  pd.read_csv(self.input_path, header=header_row)
@@ -36,5 +38,8 @@ class LoanWithdrawlReport(BaseTransformer):
         
         if "CHECK DATE" in df.columns:
             df['CHECK DATE'] = pd.to_datetime(df['CHECK DATE'], errors='coerce').dt.strftime("%m-%d-%Y")
-    
-        df.to_excel(self.output_path, index=False)
+        if is_excel:
+            df.to_excel(self.output_path, index=False)
+        else:
+            df.to_csv(self.output_path, index=False)
+            
