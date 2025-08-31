@@ -1,22 +1,23 @@
+import argparse
 import os
 import zipfile
 from pathlib import Path
 from typing import Dict, Type
 
-from .annual_load_balance_by_plan import AnnualLoanBalanceByPlan
-from .audit_contribution_summary import ParticipantContributionPivotReport
-from .audit_rollover_report import AuditRolloverReport
-from .balance_by_fund import BalanceByFund
-from .balance_info_summary_report_ytd import BalanceInfoSummaryReportYtd
-from .base import BaseTransformer, NoTransformer
-from .contribution_plan_level_report import ContributionPlanLevelReport
-from .loan_withdrawl_report import LoanWithdrawlReport
-from .summary_of_net_trust_assets import SummaryOfNetTrustAssets
-from .r25_transformation import AuditR25CheckRegister
-from .balance_info_summary_report_q4 import BalanceInfoSummaryReportQ4
-from .audit_investment_election import AuditInvestmentElectionsAsOfaSpecificDate
-from .audit_participant_level_activity_report import AuditParticipantLevelActivityReport
-from .participant_contribution_by_date_and_source import ParticipantContribution
+from ebp_transformation.fidility.annual_load_balance_by_plan import AnnualLoanBalanceByPlan
+from ebp_transformation.fidility.audit_contribution_summary import ParticipantContributionPivotReport
+from ebp_transformation.fidility.audit_rollover_report import AuditRolloverReport
+from ebp_transformation.fidility.balance_by_fund import BalanceByFund
+from ebp_transformation.fidility.balance_info_summary_report_ytd import BalanceInfoSummaryReportYtd
+from ebp_transformation.fidility.base import BaseTransformer, NoTransformer
+from ebp_transformation.fidility.contribution_plan_level_report import ContributionPlanLevelReport
+from ebp_transformation.fidility.loan_withdrawl_report import LoanWithdrawlReport
+from ebp_transformation.fidility.summary_of_net_trust_assets import SummaryOfNetTrustAssets
+from ebp_transformation.fidility.r25_transformation import AuditR25CheckRegister
+from ebp_transformation.fidility.balance_info_summary_report_q4 import BalanceInfoSummaryReportQ4
+from ebp_transformation.fidility.audit_investment_election import AuditInvestmentElectionsAsOfaSpecificDate
+from ebp_transformation.fidility.audit_participant_level_activity_report import AuditParticipantLevelActivityReport
+from ebp_transformation.fidility.participant_contribution_by_date_and_source import ParticipantContribution
 
 TRANSFORMER_MAP: Dict[str, Type[BaseTransformer]] = {
     "Annual Loan Balance by Plan": AnnualLoanBalanceByPlan,
@@ -32,6 +33,7 @@ TRANSFORMER_MAP: Dict[str, Type[BaseTransformer]] = {
     # "Audit Deferral Elections for a date range":  (NoTransformer, 3),
     "Audit R25 Check Register": AuditR25CheckRegister,
     "Participant Contribution by Date and Source-YE": ParticipantContribution,
+    "Participant Contributions by Date and Source - Q1": ParticipantContribution,
     "Audit Investment Elections As Of a Specific Date": AuditInvestmentElectionsAsOfaSpecificDate,
     "Audit participant level activity report": AuditParticipantLevelActivityReport
 }
@@ -78,3 +80,19 @@ def process_directory(engagement: str):
             print("========")
 
     return {"status": "processing complete", "engagement": engagement}
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Run processing for a given engagement name."
+    )
+    parser.add_argument(
+        "engagement_name",
+        type=str,
+        help="Engagement name (should be the same as the folder inside data/raw/)"
+    )
+    args = parser.parse_args()
+    print(f"Engagement Name: {args.engagement_name}")
+    process_directory(args.engagement_name)
+
+if __name__ == "__main__":
+    main()

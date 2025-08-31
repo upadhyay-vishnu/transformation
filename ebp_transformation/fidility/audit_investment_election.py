@@ -1,11 +1,31 @@
 import pandas as pd
 
 from .base import BaseTransformer
-from .utils import drop_ending_rows
+from .utils import drop_ending_rows, get_header_row
 
 class AuditInvestmentElectionsAsOfaSpecificDate(BaseTransformer):
     def transform(self):
-        df = pd.read_excel(self.input_path, skiprows=4)
+        
+        expected_headers = [
+            "Plan Number",
+            "Plan Name",
+            "SSN",
+            "Full Name"
+        ]
+        header_row = get_header_row(self.input_path, expected_headers)
+        
+        if header_row is None:
+            raise ValueError("Expected header not found in file")
+
+        # Re-read Excel with correct header
+        try:
+            df =  pd.read_excel(self.input_path, header=header_row)
+        except Exception:
+            try:
+                df =  pd.read_csv(self.input_path, header=header_row)
+            except Exception as e:
+                raise ValueError(f"Unsupported file format or corrupted file: {self.input_path}")
+
         df = drop_ending_rows(df)
         df.columns = df.columns.str.strip()
         if "Hire Date" in df.columns:
