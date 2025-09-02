@@ -54,20 +54,22 @@ class ParticipantContributionPivotReport(BaseTransformer):
 
         # Step 5: Ensure all required source columns exist
         required_sources = [
-            "SAFE HARBOR MATCH",
             "EMPLOYEE DEFERRAL",
             "ROTH DEFERRAL",
             "EMPLOYER MATCH",
             "ROLLOVER",
             "ROTH ROLLOVER",
             "AFTER-TAX ROLLVER",
+            "ER PROFIT SHARING"
         ]
         for source in required_sources:
             if source not in pivot_df.columns:
                 pivot_df[source] = 0
 
         # Step 6: Optional – Reorder columns
-        ordered_cols = ["SSN", "Full Name"] + required_sources
+        if "Status" not in pivot_df.columns:
+            pivot_df["Status"] = ""
+        ordered_cols = ["SSN", "Full Name", "Status"] + required_sources
         remaining_cols = [col for col in pivot_df.columns if col not in ordered_cols]
         final_cols = ordered_cols + remaining_cols
 

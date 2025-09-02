@@ -29,29 +29,42 @@ class BalanceInfoSummaryReportYtd(BaseTransformer):
                 raise ValueError(f"Unsupported file format or corrupted file: {self.input_path}")
         print("===== Skipping first 5 Rows ======= \n")
         df.columns = df.columns.str.strip()
-        for col in df.select_dtypes(include=["datetime64[ns]"]).columns:
-            df[col] = df[col].dt.date
         df = drop_ending_rows(df)
         # Step 2: Define base and optional group-by columns
         base_group_cols = ["SSN", "First Name - DC", "Last Name - DC"]
-        optional_cols = ["Hire Date", "Eligible Date", "Term Date", "Loan Repayment"]
-        has_dob = "Date of Birth" in df.columns
+        optional_cols = ["Hire Date", "Eligibility Date", "Term Date", "Loan Repayment"]
+        has_dob = (
+            "Date of Birth" in df.columns 
+            and df["Date of Birth"].notna().all() 
+            and (df["Date of Birth"].astype(str).str.strip() != "").all()
+        )
         if has_dob:
             base_group_cols.append("Date of Birth")
         else:
             optional_cols.append("Date of Birth")
+        
+        has_eligibility_date = (
+            "Eligibility Date" in df.columns 
+            and df["Eligibility Date"].notna().all() 
+            and (df["Eligibility Date"].astype(str).str.strip() != "").all()
+        )
+        if has_dob:
+            base_group_cols.append("Eligibility Date")
+        else:
+            optional_cols.append("Eligibility Date")
         # Step 3: Check for which optional columns are present in the file
-        available_optional_cols = [col for col in optional_cols if col in df.columns]
+        available_optional_cols = [col for col in optional_cols if col in df.columns and df[col].notna().all()]
 
         # Step 4: Group-by columns = base + available optional
         group_cols = base_group_cols + available_optional_cols
 
         # Step 5: Define numeric columns to sum (make sure they exist)
-        sum_cols = ["Beginning Balance Cost $", "Contribution $", "Ending Balance Cost $"]
-        existing_sum_cols = [col for col in sum_cols if col in df.columns]
-
+        not_sum_cols = ["Beginning Balance Cost $", "Contribution $", "Ending Balance Cost $"]
+        existing_sum_cols = [col for col in df.columns if col not in not_sum_cols]
+        existing_sum_cols = list(set(existing_sum_cols) - set(base_group_cols))
         # Step 6: Perform groupby + aggregation
         grouped_df = df.groupby(group_cols, as_index=False)[existing_sum_cols].sum()
+
 
         # Step 7: Add missing optional columns (if any), set them to None
         missing_optional_cols = [col for col in optional_cols if col not in df.columns]
@@ -59,7 +72,7 @@ class BalanceInfoSummaryReportYtd(BaseTransformer):
             grouped_df[col] = None
 
         # Step 8: Arrange final column order
-        final_col_order = base_group_cols + available_optional_cols + existing_sum_cols + missing_optional_cols
+        final_col_order = set(base_group_cols + available_optional_cols + existing_sum_cols + missing_optional_cols)
         final_col_order = [col for col in final_col_order if col in grouped_df.columns]
         grouped_df = grouped_df[final_col_order]
 

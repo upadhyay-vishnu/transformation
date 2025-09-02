@@ -30,8 +30,8 @@ class LoanWithdrawlReport(BaseTransformer):
         header_row = df.columns
         df = df[~df.apply(lambda row: row.equals(header_row), axis=1)]
 
-        if "CASH" in df.columns:
-            df["CASH"] = pd.to_numeric(df["CASH"], errors="coerce").fillna(0)
+        # if "CASH" in df.columns:
+        #     df["CASH"] = pd.to_numeric(df["CASH"], errors="coerce").fillna(0)
         df.columns = df.columns.str.strip()
         if "TRADE DATE" in df.columns:
             df['TRADE DATE'] = pd.to_datetime(df['TRADE DATE'], errors='coerce').dt.strftime("%m-%d-%Y")
