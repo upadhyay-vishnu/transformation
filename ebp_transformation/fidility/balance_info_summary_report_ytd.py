@@ -32,29 +32,11 @@ class BalanceInfoSummaryReportYtd(BaseTransformer):
         df = drop_ending_rows(df)
         # Step 2: Define base and optional group-by columns
         base_group_cols = ["SSN", "First Name - DC", "Last Name - DC"]
-        optional_cols = ["Hire Date", "Eligibility Date", "Term Date", "Loan Repayment"]
-        has_dob = (
-            "Date of Birth" in df.columns 
-            and df["Date of Birth"].notna().all() 
-            and (df["Date of Birth"].astype(str).str.strip() != "").all()
-        )
-        if has_dob:
-            base_group_cols.append("Date of Birth")
-        else:
-            optional_cols.append("Date of Birth")
-        
-        has_eligibility_date = (
-            "Eligibility Date" in df.columns 
-            and df["Eligibility Date"].notna().all() 
-            and (df["Eligibility Date"].astype(str).str.strip() != "").all()
-        )
-        if has_dob:
-            base_group_cols.append("Eligibility Date")
-        else:
-            optional_cols.append("Eligibility Date")
+        optional_cols = ["Date of Birth", "Hire Date", "Eligibility Date", "Term Date", "Loan Repayment"]
+
         # Step 3: Check for which optional columns are present in the file
         available_optional_cols = [col for col in optional_cols if col in df.columns and df[col].notna().all()]
-
+        up_optional_cols = [col for col in optional_cols if col not in available_optional_cols]
         # Step 4: Group-by columns = base + available optional
         group_cols = base_group_cols + available_optional_cols
 
@@ -67,7 +49,7 @@ class BalanceInfoSummaryReportYtd(BaseTransformer):
 
 
         # Step 7: Add missing optional columns (if any), set them to None
-        missing_optional_cols = [col for col in optional_cols if col not in df.columns]
+        missing_optional_cols = [col for col in up_optional_cols if col not in df.columns]
         for col in missing_optional_cols:
             grouped_df[col] = None
 
